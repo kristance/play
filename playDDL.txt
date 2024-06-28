@@ -1,0 +1,135 @@
+-- play.card definition
+
+CREATE TABLE `card` (
+  `idxCard` int(11) NOT NULL AUTO_INCREMENT,
+  `cardName` varchar(100) NOT NULL DEFAULT '',
+  `owner` varchar(100) NOT NULL DEFAULT '',
+  `ownerAmho` varchar(100) NOT NULL DEFAULT '""',
+  `password` int(11) NOT NULL DEFAULT 0,
+  `passwordAmho` varchar(100) NOT NULL DEFAULT '""',
+  `cardNo1` int(11) NOT NULL DEFAULT 0,
+  `cardNo2` int(11) NOT NULL DEFAULT 0,
+  `cardNo3` int(11) NOT NULL DEFAULT 0,
+  `cardNo4` int(11) NOT NULL DEFAULT 0,
+  `cardNoAmho` varchar(100) NOT NULL DEFAULT '',
+  `expDate` varchar(100) NOT NULL DEFAULT '',
+  PRIMARY KEY (`idxCard`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- play.cardChargeList definition
+
+CREATE TABLE `cardChargeList` (
+  `idxCardCharge` int(11) NOT NULL AUTO_INCREMENT,
+  `chargeKey` varchar(100) NOT NULL DEFAULT '""',
+  `name` varchar(100) NOT NULL DEFAULT '""',
+  `amount` int(11) NOT NULL DEFAULT 0,
+  `chargePlace` varchar(100) NOT NULL DEFAULT '""',
+  `cardConnect` int(11) NOT NULL DEFAULT -100,
+  `chargeDate` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`idxCardCharge`),
+  KEY `cardChargeList_card_FK` (`cardConnect`),
+  CONSTRAINT `cardChargeList_card_FK` FOREIGN KEY (`cardConnect`) REFERENCES `card` (`idxCard`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+
+
+-- play.`member` definition
+
+CREATE TABLE `member` (
+  `idxM` int(11) NOT NULL AUTO_INCREMENT,
+  `id` varchar(100) NOT NULL DEFAULT 'anonymous',
+  `password` varchar(100) NOT NULL DEFAULT '-1',
+  `addrPost` varchar(100) NOT NULL DEFAULT ' ',
+  `addrMain` varchar(100) NOT NULL DEFAULT ' ',
+  `addrDetail1` varchar(100) NOT NULL DEFAULT ' ',
+  `addrDetail2` varchar(100) NOT NULL DEFAULT ' ',
+  `email` varchar(100) NOT NULL DEFAULT ' ',
+  `phone` varchar(100) NOT NULL DEFAULT ' ',
+  `image` varchar(100) NOT NULL DEFAULT ' ',
+  `name` varchar(100) NOT NULL DEFAULT ' ',
+  PRIMARY KEY (`idxM`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- play.playInfo definition
+
+CREATE TABLE `playInfo` (
+  `idxP` int(11) NOT NULL AUTO_INCREMENT,
+  `playTitle` varchar(100) NOT NULL DEFAULT ' ',
+  `playStartDate` date NOT NULL,
+  `playEndDate` date NOT NULL,
+  `playDay` varchar(100) NOT NULL DEFAULT ' ',
+  `playPlace` varchar(100) NOT NULL DEFAULT ' ',
+  `playStar` float NOT NULL DEFAULT 0,
+  `playTime` varchar(100) NOT NULL DEFAULT ' ',
+  `playPoster` varchar(100) NOT NULL DEFAULT 'default/defaultPoster.jpeg',
+  `playDetail` varchar(100) NOT NULL DEFAULT 'default/defaultDetail.jpg ',
+  `playFee` int(11) NOT NULL DEFAULT 0,
+  `expire` varchar(100) NOT NULL DEFAULT 'no',
+  `orderCount` int(11) NOT NULL DEFAULT 0,
+  `trigger` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`idxP`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- play.reply definition
+
+CREATE TABLE `reply` (
+  `idxC` int(11) NOT NULL AUTO_INCREMENT,
+  `viewer` varchar(100) NOT NULL DEFAULT '',
+  `subjectReply` varchar(100) NOT NULL DEFAULT '',
+  `contentReply` varchar(100) NOT NULL DEFAULT '',
+  `playStar` int(11) NOT NULL DEFAULT 0,
+  `writeDate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `imageReply` varchar(100) NOT NULL DEFAULT '',
+  `viewCount` int(11) NOT NULL DEFAULT 0,
+  `playInfoConnect` int(11) DEFAULT -1,
+  `memberConnect` int(11) DEFAULT -1,
+  PRIMARY KEY (`idxC`),
+  KEY `reply_playInfo_FK` (`playInfoConnect`),
+  KEY `reply_member_FK` (`memberConnect`),
+  CONSTRAINT `reply_member_FK` FOREIGN KEY (`memberConnect`) REFERENCES `member` (`idxM`) ON UPDATE CASCADE,
+  CONSTRAINT `reply_playInfo_FK` FOREIGN KEY (`playInfoConnect`) REFERENCES `playInfo` (`idxP`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+
+-- play.ticket definition
+
+CREATE TABLE `ticket` (
+  `idxT` int(11) NOT NULL AUTO_INCREMENT,
+  `id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `viewer` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `viewerCount` int(11) NOT NULL DEFAULT 0,
+  `phone` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `addrMain` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `addrDetail1` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `addrDetail2` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `seatNumber` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `viewDate` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `viewTime` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `orderDate` timestamp NOT NULL DEFAULT current_timestamp(),
+  `playInfoConnect` int(11) DEFAULT NULL,
+  `bookNumber` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0',
+  `memberConnect` int(11) DEFAULT NULL,
+  `viewPlace` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `amount` int(11) NOT NULL DEFAULT 0,
+  `playPoster` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `playTitle` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `playStartDate` date NOT NULL,
+  `playEndDate` date NOT NULL,
+  `chargeKey` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ' ',
+  `starTrigger` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'off',
+  PRIMARY KEY (`idxT`),
+  KEY `ticket_member_FK` (`memberConnect`),
+  KEY `ticket_playInfo_FK` (`playInfoConnect`),
+  CONSTRAINT `ticket_member_FK` FOREIGN KEY (`memberConnect`) REFERENCES `member` (`idxM`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `ticket_playInfo_FK` FOREIGN KEY (`playInfoConnect`) REFERENCES `playInfo` (`idxP`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_nopad_ci;
+
+
+
+
+
+

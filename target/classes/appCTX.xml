@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+<bean id="member" class="com.krist.play.vo.MemberVO" />
+<bean id="playInfo" class="com.krist.play.vo.PlayInfoVO" />
+<bean id="playReply" class="com.krist.play.vo.PlayReplyVO" />
+<bean id="playTicket" class="com.krist.play.vo.PlayTicketVO" />
+<bean id="card" class="com.krist.play.vo.CardVO"></bean>
+<bean id="chargeListVO" class="com.krist.play.vo.CardChargeListVO"></bean>
+
+
+<bean id="playReplyList" class="com.krist.play.vo.PlayReplyList" />
+<bean id="playTicketList" class="com.krist.play.vo.PlayTicketList"></bean>
+<bean id="playInfoList" class="com.krist.play.vo.PlayInfoList"></bean>
+
+<bean id="playInfoService" class="com.krist.play.service.PlayInfoService"></bean>
+<bean id="playTicketService" class="com.krist.play.service.PlayTicketService"></bean>
+<bean id="memberService" class="com.krist.play.service.MemberService"></bean>
+<bean id="playReplyService" class="com.krist.play.service.PlayReplyService"></bean>
+<bean id="paymentService" class="com.krist.play.service.PaymentService"></bean>
+<bean id="cardService" class="com.krist.play.service.CardService"></bean>
+
+</beans>

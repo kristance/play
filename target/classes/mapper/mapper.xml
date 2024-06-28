@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.krist.play.dao.MainDAO">
+
+<!-- 메인페이지 carousel-->
+<select id="getMainCarousel" resultType="com.krist.play.vo.PlayInfoVO">
+	select distinct * from playInfo order by orderCount limit 3  
+</select>
+
+<select id="getTotalCount" resultType="int">
+	select count(*) from
+	playInfo
+</select>
+
+<select id="getPlayTotalList"
+	parameterType="com.krist.play.vo.PlayInfoList"
+	resultType="com.krist.play.vo.PlayInfoVO">
+	select * from playInfo where expire = "no" order by
+	playStartDate desc limit #{startNo}, #{pageSize}
+</select>
+
+<select id="getPlayInfo" parameterType="int"
+	resultType="com.krist.play.vo.PlayInfoVO">
+	select * from playInfo where idxP = #{idxP}
+</select>
+
+<!-- loginNotB 로그인 -->
+<select id="getLoginCheck"
+	parameterType="com.krist.play.vo.MemberVO" resultType="int">
+	select count(*)
+	from member where id = #{id} and password = #{password}
+</select>
+
+<!-- 아이디/ 비밀번호 찾기 페이지 - 아이디 찾기  -->
+<select id="searchPasswordForIdForm" parameterType="java.util.HashMap" resultType="java.lang.String">
+	select id from member where name = #{name} and email = #{email}
+</select>
+
+ 
+<!-- 아이디/ 비밀번호 찾기 페이지 - 비밀번호 찾기  -->
+<select id="searchPasswordForPassForm" parameterType="java.util.HashMap" resultType="java.lang.String">
+	select password from member where name = #{name} and email = #{email} and id = #{id}
+</select>
+
+
+
+<select id="getAnonymousUserInfo"
+	parameterType="com.krist.play.vo.PlayTicketVO" resultType="int">
+	select count (*) from ticket where bookNumber = #{bookNumber} and
+	email = #{email}
+</select>
+
+<!-- 카드 데이터 베이스의 카드 정보와 입력된 카드 정보가 일치하는지 확인 -->
+<select id="checkCardValid"
+	parameterType="com.krist.play.vo.CardVO" resultType="int">
+	select count(*)
+	from card where cardName = #{cardName} and ownerAmho = #{ownerAmho}
+	and
+	cardNoAmho = #{cardNoAmho} and expDate = #{expDate}
+</select>
+
+<!-- 카드 비밀번호가 일치하는지 확인 -->
+<select id="payUsingCard"
+	parameterType="com.krist.play.vo.CardVO" resultType="int">
+	select count(*)
+	from card where cardName = #{cardName} and ownerAmho = #{ownerAmho}
+	and
+	cardNoAmho = #{cardNoAmho} and expDate = #{expDate} and passwordAmho =
+	#{passwordAmho}
+</select>
+
+<!-- 카드 데이터 베이스 결제 리스트에 차징키를 등록하기 위해 데이터베이스 카드 idx 불러오기 -->
+<select id="getCardIdx" parameterType="com.krist.play.vo.CardVO"
+	resultType="int">
+	select idxCard from card where cardName = #{cardName} and
+	ownerAmho = #{ownerAmho} and
+	cardNoAmho = #{cardNoAmho} and expDate = #{expDate} and passwordAmho =
+	#{passwordAmho}
+</select>
+
+<!-- 카드 데이터베이스의 결제 내역에 결제 내역을 추가하기 전에 확인  -->
+<select id="beforeCharge" 
+	parameterType="com.krist.play.vo.CardChargeListVO" resultType="int">
+	select count(*) from cardChargeList where chargeKey = #{chargeKey}
+												 and amount = #{amount}
+												 and cardConnect = #{cardConnect}
+												 and name = #{name}
+												 and chargePlace = #{chargePlace}
+</select>
+
+
+
+<!-- 카드 데이터베이스의 결제 내역에 결제 내역을 추가 -->
+<insert id="insertChargeList"
+	parameterType="com.krist.play.vo.CardChargeListVO">
+	insert into cardChargeList values (idxCardCharge,
+	#{chargeKey}, #{name}, #{amount}, #{chargePlace}, #{cardConnect},
+	current_timestamp)
+</insert>
+
+<!-- 예약 페이지 -> 티켓 저장 전 확인  -->
+<select id="beforeSave"
+	parameterType="com.krist.play.vo.PlayTicketVO" resultType="int">
+	select count(*) from ticket
+	where id = #{id} and viewer = #{viewer} and bookNumber = #{bookNumber}
+	and chargeKey = #{chargeKey} and playInfoConnect = #{playInfoConnect}
+</select>
+
+<!-- 예약 페이지 -> 티켓 저장 -->
+<insert id="saveTicket"
+	parameterType="com.krist.play.vo.PlayTicketVO">
+	insert into ticket
+	values (idxT, #{id}, #{viewer},
+	#{viewerCount}, #{phone}, #{email},
+	#{addrMain}, #{addrDetail1}, #{addrDetail2},
+	#{seatNumber}, #{viewDate}, #{viewTime},
+	current_timestamp,
+	#{playInfoConnect}, #{bookNumber},
+	#{memberConnect}, #{viewPlace},
+	#{amount}, #{playPoster}, #{playTitle}, #{playStartDate}, #{playEndDate},
+	#{chargeKey}, starTrigger)
+</insert>
+
+<!-- 아이디 중복 체크 -->
+<select id="idCheck" parameterType="java.lang.String"
+	resultType="int">
+	select count(*) from member where id = #{id}
+</select>
+
+<!-- 회원가입 페이지 - 회원 가입 전에 동일한 정보로 가입되어있는 아이가 있는지 확인 -->
+<select id="checkCountSignUp" parameterType="com.krist.play.vo.MemberVO" resultType="int">
+	select count(*) from member 
+				where id = #{id} 
+			and password = #{password}
+			and addrPost = #{addrPost}
+			and addrMain = #{addrMain}
+			and addrDetail1 = #{addrDetail1}
+			and addrDetail2 = #{addrDetail2}
+			and email = #{email}
+			and phone = #{phone}
+			and name = #{name}
+</select>
+
+<!-- 회원가입 -->
+<insert id="signUp" parameterType="com.krist.play.vo.MemberVO">
+	insert into member value (
+	idxM, #{id}, #{password}, #{addrPost}, #{addrMain}, #{addrDetail1},
+	#{addrDetail2}, #{email}, #{phone}, image, #{name} )
+</insert>
+
+<!-- 예약수 증가 -->
+<update id="upOrderCount" parameterType="int">
+	update playInfo set
+	orderCount = orderCount + 1 where idxP = #{idxP}
+</update>
+
+<!-- 비회원 member 테이블 등록 -->
+<insert id="saveMember"
+	parameterType="com.krist.play.vo.PlayTicketVO">
+	insert into member
+	values (idxM, #{id}, password, addrPost ,#{addrMain}, #{addrDetail1},
+	#{addrDetail2}, #{email}, #{phone}, image, name)
+</insert>
+
+<!-- 회원 정보 1건 unlogin -->
+<select id="getMemberInfo"
+	parameterType="com.krist.play.vo.PlayTicketVO"
+	resultType="com.krist.play.vo.MemberVO">
+	select * from member where email = #{email} and phone =
+	#{phone} and addrMain = #{addrMain} group by id
+</select>
+
+<!-- 회원 정보 1건 - id -->
+<select id="getMemberInfoId" parameterType="java.lang.String"
+	resultType="com.krist.play.vo.MemberVO">
+	select * from member where id = #{id}
+</select>
+
+<!--####################### 예약 확인 페이지 ######################## -->
+
+<!-- 예약 티켓 리스트 - totalCount 얻기 - 로그인 O -->
+<select id="getTotalCountLoginO" parameterType="int"
+	resultType="int">
+	select count(*) from ticket where memberconnect = #{idxM}
+</select>
+
+<!-- 예약 티켓 리스트 - 로그인 O -->
+<select id="getOrderedTicketLoginO"
+	parameterType="com.krist.play.vo.PlayTicketList"
+	resultType="com.krist.play.vo.PlayTicketVO">
+	select * from ticket where memberconnect = #{idxM} order by
+	idxT desc limit #{startNo}, ${pageSize}
+</select>
+
+<!-- 예약 티켓 리스트 작성을 위한 티켓 1건 정보 불러오기; memberconnect -->
+<select id="getMemberInfo_BookingCheckList"
+	parameterType="java.lang.String"
+	resultType="com.krist.play.vo.PlayTicketVO">
+	select * from ticket where bookNumber = #{bookNumber}
+</select>
+
+<!-- 예약 티켓 리스트 - totalCount 얻기 - 로그인 X -->
+<select id="getTotalCountLoginX" parameterType="int"
+	resultType="int">
+	select count(*) from ticket where memberconnect = #{idxM}
+</select>
+
+<!-- 예약 티켓 리스트 - 로그인 X -->
+<select id="getOrderedTicketLoginX"
+	parameterType="com.krist.play.vo.PlayTicketList"
+	resultType="com.krist.play.vo.PlayTicketVO">
+	select * from ticket where memberconnect = #{idxM} order by
+	idxT desc limit #{startNo}, ${pageSize}
+</select>
+
+<!-- 관람객 이름 표시 위함 ; viewer -->
+<select id="getMemberInfo_bookCheckList"
+	parameterType="java.lang.String"
+	resultType="com.krist.play.vo.PlayTicketVO">
+	select * from ticket where bookNumber = #{bookNumber}
+</select>
+
+<!-- 예약 확인 페이지 - 예약한 티켓 정보 -->
+<select id="getOrderedTicketInfo_ticketInfo" parameterType="int"
+	resultType="com.krist.play.vo.PlayTicketVO">
+	select * from ticket where idxT = #{idxT}
+</select>
+
+<!-- 예약 확인 페이지 - 예약한 티켓을 취소하기 위해 정보를 얻어옴 -->
+<select id="getOrderTicketForCancel" parameterType="int"
+	resultType="com.krist.play.vo.PlayTicketVO">
+	select * from ticket where idxT = #{idxT}
+</select>
+
+<!-- 예약 확인 페이지 - 티켓 테이블에서 취소 티켓 삭제 -->
+<delete id="cancelBooking" parameterType="int">
+	delete from ticket
+	where idxT = #{idxT}
+</delete>
+
+<!-- 예약 확인 페이지 - 카드 테이블에서 취소 티켓 결제 내역 삭제 -->
+<delete id="cancelCharge"
+	parameterType="com.krist.play.vo.cardCheckParame">
+	delete from cardChargeList where amount = #{amount} and
+	chargeKey = #{chargeKey}
+</delete>
+
+<!-- 예약 확인 페이지 - 취소 티켓의 공연 정보의 예약 횟수를 줄인다. -->
+<update id="downOrderCount" parameterType="int">
+	update playInfo set
+	orderCount = (orderCount - 1) where idxP = #{idxP}
+</update>
+
+<!-- 예약 확인 페이지 - 예약 수정하기 위해 티켓 정보 읽기 -->
+<select id="getOrderedTicketInfo" parameterType="int"
+	resultType="com.krist.play.vo.PlayTicketVO">
+	select * from ticket where idxT = #{idxT}
+</select>
+
+<!-- 예약 확인 페이지 - 예약 수정하기 위해 공연 정보를 불러온다. -->
+<select id="getPlayInfoForModify" parameterType="int"
+	resultType="com.krist.play.vo.PlayInfoVO">
+	select * from playInfo where idxP = #{idxP}
+</select>
+
+<!-- 예약 확인 페이지 - 예약 수정 -->
+<update id="updateTicketInfo" parameterType="com.krist.play.vo.PlayTicketVO">
+	update ticket set viewer = #{viewer},
+				 viewDate = #{viewDate},
+				  viewTime = #{viewTime},
+				   phone = #{phone},
+				    email = #{email} where idxT = #{idxT}
+</update>
+
+<!-- 예약 확인 페이지  - 회원 정보 수정 페이지의 profile 이미지 출력을 위해 불러옴 -->
+<select id="getMemberProfile" parameterType="int" resultType="com.krist.play.vo.MemberVO">
+	select * from member where idxM = #{idxM}
+</select>
+
+
+<!-- ###################### 회원 정보 수정 페이지 ################## -->
+<!-- 회원 정보 수정폼의 디폴트값 -->
+<select id="getMemberInfo_modifyInfo" parameterType="int"
+	resultType="com.krist.play.vo.MemberVO">
+	select * from member where idxM = #{idxM}
+</select>
+
+<update id="modifyMemberInfo"
+	parameterType="com.krist.play.vo.MemberVO">
+	update member set password = #{password},
+					 name = #{name},
+					  addrPost = #{addrPost},
+					   addrMain = #{addrMain},
+						addrDetail1 = #{addrDetail1},
+						 addrDetail2 = #{addrDetail2},
+						 email = #{email},
+						  phone = #{phone},
+					  		image = #{image} where idxM = #{idxM}
+</update>
+
+<!-- 회원 탈퇴 -->
+<delete id="signOut" parameterType="java.util.Map">
+	delete from member where id =
+	#{id} and password = #{password}
+</delete>
+
+
+
+<!-- ################공연 리스트 페이지 ######################### -->
+<!-- 예매율 1위 playinfoVo -->
+<select id="getPlayInfo_playList"
+	resultType="com.krist.play.vo.PlayInfoVO">
+	select * from playInfo order by orderCount desc limit 1
+</select>
+
+<!-- 현재 상영중인 공연 리스트의 totalCount -->
+<select id="getTotalCount_playList" resultType="int">
+	select count(*)
+	from playInfo where expire = "no"
+</select>
+
+<!-- 현재 상영중인 공연 리스트 -->
+<select id="getPlayList_playList"
+	parameterType="com.krist.play.vo.PlayInfoList"
+	resultType="com.krist.play.vo.PlayInfoVO">
+	select * from playInfo where expire = "no" order by
+	playStartDate desc limit #{startNo}, #{pageSize}
+</select>
+
+<!-- 공연 정보 상세 depth 1 -->
+<select id="getplayinfo_playInfo" parameterType="int"
+	resultType="com.krist.play.vo.PlayInfoVO">
+	select * from playInfo where idxP = #{idxP}
+</select>
+
+<!-- 공연 정보 상세 depth 2 -->
+<select id="getPlayInfo_playInfoDetail" parameterType="int"
+	resultType="com.krist.play.vo.PlayInfoVO">
+	select * from playInfo where idxP = #{idxP}
+</select>
+
+<!-- ############## 공연 후기 페이지 ################### -->
+<!-- 공연 후기 리스트 totalCount -->
+<select id="getTotalCount_AfterViewReplyList" resultType="int">
+	select
+	count(*) from reply
+</select>
+
+<!-- 공연 후기 리스트 -->
+<select id="getPlayReply_afterViewReplyList"
+	parameterType="com.krist.play.vo.PlayReplyList"
+	resultType="com.krist.play.vo.PlayReplyVO">
+	select * from reply order by idxC desc limit #{startNo},
+	#{pageSize}
+</select>
+
+<!-- 봤던 공연 선택 박스 -->
+<select id="getViewedTitle_AfterViewReplyWrite"
+	parameterType="java.lang.String" resultType="com.krist.play.vo.PlayTicketVO">
+	select t.* from ticket as t join member as m on t.memberConnect =
+	m.idxM where t.id = #{loginId} and t.starTrigger = "off"
+</select>
+
+<!-- 로그인한 계정의 주인이 봤던 공연이 있는지 없는지 -->
+<select id="canYouSawPlay" parameterType="java.lang.String"
+	resultType="int">
+	select count(*) from ticket where id = #{id} and starTrigger = "off"
+</select>
+
+
+<!-- 공연 후기와 공연 정보를 연결하기 위한 idxP를 불러온다. -->
+<select id="getPlayInfo_saveReply"
+	parameterType="com.krist.play.vo.Parame" resultType="int">
+	select distinct
+	t.playinfoConnect from ( select * from ticket where memberConnect =
+	#{idxM} and playTitle = #{playTitle} ) as t
+</select>
+
+<!-- 공연 후기 저장 -->
+<insert id="saveReply"
+	parameterType="com.krist.play.vo.PlayReplyVO">
+	insert into reply values (idxC, #{viewer},
+	#{subjectReply}, #{contentReply}, #{playStar}, current_Timestamp,
+	#{imageReply}, viewCount ,#{playInfoConnect}, #{memberConnect})
+</insert>
+
+
+<!-- 저장된 공연 후기 읽어오기 - 공연 후기 읽기 -->
+<select id="getReplyInfo" parameterType="int"
+	resultType="com.krist.play.vo.PlayReplyVO">
+	select * from reply where idxC = #{idxC}
+</select>
+
+
+<!-- 공연 후기 읽기 페이지에서 프로필 사진을 가져오기 위해 멤버 정보를 얻어옴 - 공연 후기 읽기 -->
+<select id="getMemberInfo_AfterVieewReplyRead"
+	parameterType="int" resultType="com.krist.play.vo.MemberVO">
+	select * from member where idxM =
+	#{idxM}
+</select>
+
+
+<!-- 공연 후기 읽기 페이지 - 별점, 제목을 출력하기 위해 공연 정보를 불러옴-->
+<select id="getPlayInfo_AfterViewReplyRead" parameterType="int"
+	resultType="com.krist.play.vo.PlayInfoVO">
+	select * from playInfo where idxP = #{idxP}
+</select>
+
+
+<!-- 카테고리가 제목일 때 검색 - totalCount -->
+<select id="getTotalCountForSubject_AVRR"
+	parameterType="java.lang.String" resultType="int">
+	select count(*) from reply
+	where subjectReply like concat("%" , #{keyword}, "%")
+</select>
+
+<!-- 카테고리가 viewer일 때 검색 - totalCount -->
+<select id="getTotalCountForViewer_AVRR"
+	parameterType="java.lang.String" resultType="int">
+	select count(*) from reply
+	where viewer like concat("%" , #{keyword}, "%")
+</select>
+
+
+<!-- 카테고리가 제목일 때 검색 리스트 -->
+<select id="getSearchListForSubject"
+	parameterType="com.krist.play.vo.cardCheckParame"
+	resultType="com.krist.play.vo.PlayReplyVO">
+	select * from reply where subjectReply like concat("%" ,
+	#{keyword}, "%") order by idxC desc limit #{list.startNo},
+	#{list.pageSize}
+</select>
+
+<!-- 카테고리가 viewer일 때 검색 리스트 -->
+	<select id="getSearchListForViewer"
+		parameterType="com.krist.play.vo.cardCheckParame"
+		resultType="com.krist.play.vo.PlayReplyVO">
+		select * from reply where viewer like concat("%" ,
+		#{keyword}, "%") order by idxC desc limit #{list.startNo},
+		#{list.pageSize}
+
+	</select>
+	
+	<!-- 공연 후기의 조회수를 올림 -->
+	<update id="upReplyViewCount" parameterType="int">
+		update reply set viewCount = viewCount + 1 where idxC = #{idxC}
+	</update>
+
+<!-- 공연 후기 저장 페이지 - 평균 별점을 위해 본 사람을 불러온다. -->
+<select id="getAfterViewerCount" parameterType="int" resultType="int">
+	select count(*) from ticket where playInfoConnect = #{idxP} and id != "anonymous"
+</select>
+
+<!-- 공연 후기 저장 페이지 - 평균 별점을 위해 본 사람의 별점을 모두 더한 값을 불러온다. -->
+<select id="getTotalStar" parameterType="int" resultType="int">
+	select sum(playStar) from reply where playInfoConnect = #{idxP} 
+</select>
+
+<!-- 공연 후기 저장 페이지 - 평균 별점을 공연 정보에 저장한다. -->
+<update id="updateStar" parameterType="com.krist.play.vo.PlayInfoVO">
+	update playInfo set playStar = #{playStar} where idxP = #{idxP}
+</update>
+
+<!-- 공연 후기 수정 페이지 - 공연 후기를 수정하기 위해 후기 1건을 불러온다.. -->
+<select id="getReplyInfoForModify" 
+		parameterType="int"
+		resultType="com.krist.play.vo.PlayReplyVO">
+	select * from reply where idxC = #{idxC}
+
+</select>
+
+<!-- 공연 후기 수정 페이지의 프로필 사진을 가져오기 위해 멤버 정보를 얻어옴 -->
+<select id="getMemberInfo_modifyReplyform" parameterType="int" resultType="com.krist.play.vo.MemberVO">
+	select * from member where idxM = #{idxM}
+</select>
+
+<!-- 공연 후기 수정 페이지 - 공연 후기를 업데이트하기 위해 저장된 후기를 불러옴 -->
+<select id="getReplyInfoForUpdate" parameterType="int" resultType="com.krist.play.vo.PlayReplyVO">
+	select * from reply where idxC = #{idxC}
+</select>
+
+<!-- 공연 후기 수정 페이지 - 공연 후기를 업데이트 한다. -->
+<update id="updateAfterViewReply" parameterType="com.krist.play.vo.PlayReplyVO">
+	update reply set subjectReply = #{subjectReply}, 
+						contentReply = #{contentReply},
+						imageReply = #{imageReply} where idxC = #{idxC}
+
+</update>
+
+<!-- 공연 후기 작성 페이지 - 별점을 매긴 티켓의 starTrigger를 on으로 바꾼다. -->
+<update id="turnStarTrigger" parameterType="int">
+	update ticket set starTrigger = "on" where idxT = #{idxT}
+</update>
+
+<!-- 공연 후기 작성 페이지 - 공연 제목 표시를 위해 공연 제목을 불러옴 -->
+<select id="getTitle" parameterType="int" resultType="java.lang.String">
+	select playTitle from ticket where idxT = #{idxT}
+</select>
+
+
+</mapper>
